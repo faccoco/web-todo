@@ -1,29 +1,89 @@
-
-# C++ build files
+# Build directories
 build/
-*.o
-*.a
-*.so
-*.dll
-*.exe
+dist/
+out/
 
-# CMake related files
+# C++ build artifacts
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+.cmake/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
+compile_commands.json
 
-# Node.js dependencies (for potential frontend tooling)
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Node.js dependencies and build
 node_modules/
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# IDE and OS specific
+# React build
+frontend/build/
+frontend/dist/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
+*.swo
 *~
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # Docker
-docker-compose.override.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Package manager lock files (keep these)
+# package-lock.json
+# yarn.lock
+
+# Test artifacts
+test_*.db
+*_test.db
+test_database.db
+
+# Runtime files
+*.pid
