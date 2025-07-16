@@ -1,8 +1,9 @@
 # Web Todo App
 
-A full-stack todo application with C++ backend and React frontend, entirely developed by Claude-Code.
+A full-stack todo application with C++ backend and React frontend, entirely developed and tested by Claude-Code.
 
-The development and testing of the entire project were completed by claude-code.
+## TODO:
+- [ ] including gemini code assistant to automize issues and bug-fixing
 
 ## Features
 
