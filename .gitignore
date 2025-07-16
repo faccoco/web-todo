@@ -1,0 +1,29 @@
+
+# C++ build files
+build/
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# CMake related files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Node.js dependencies (for potential frontend tooling)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE and OS specific
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Docker
+docker-compose.override.yml
