@@ -1,6 +1,6 @@
 # Web Todo App
 
-A full-stack todo application with C++ backend and React frontend, optimized for Raspberry Pi deployment entirely developed by claude-code.
+A full-stack todo application with C++ backend and React frontend, entirely developed by claude-code.
 
 The development and testing of the entire project were completed by claude-code.
 
