@@ -48,6 +48,7 @@ bool Database::initialize() {
             completed INTEGER DEFAULT 0,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
+            due_date TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
     )";
@@ -73,7 +74,7 @@ std::string Database::getCurrentTimestamp() {
 // Todo methods
 std::vector<Todo> Database::getAllTodos(int user_id) {
     std::vector<Todo> todos;
-    const char* sql = "SELECT id, user_id, text, completed, created_at, updated_at FROM todos WHERE user_id = ? ORDER BY created_at DESC";
+    const char* sql = "SELECT id, user_id, text, completed, created_at, updated_at, due_date FROM todos WHERE user_id = ? ORDER BY created_at DESC";
     
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
@@ -92,6 +93,8 @@ std::vector<Todo> Database::getAllTodos(int user_id) {
         todo.completed = sqlite3_column_int(stmt, 3) != 0;
         todo.created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
         todo.updated_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        const char* due_date_text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        todo.due_date = due_date_text ? due_date_text : "";
         todos.push_back(todo);
     }
     
@@ -100,8 +103,8 @@ std::vector<Todo> Database::getAllTodos(int user_id) {
 }
 
 Todo Database::getTodoById(int id, int user_id) {
-    Todo todo = {-1, -1, "", false, "", ""};
-    const char* sql = "SELECT id, user_id, text, completed, created_at, updated_at FROM todos WHERE id = ? AND user_id = ?";
+    Todo todo = {-1, -1, "", false, "", "", ""};
+    const char* sql = "SELECT id, user_id, text, completed, created_at, updated_at, due_date FROM todos WHERE id = ? AND user_id = ?";
     
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
@@ -120,38 +123,45 @@ Todo Database::getTodoById(int id, int user_id) {
         todo.completed = sqlite3_column_int(stmt, 3) != 0;
         todo.created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
         todo.updated_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        const char* due_date_text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        todo.due_date = due_date_text ? due_date_text : "";
     }
     
     sqlite3_finalize(stmt);
     return todo;
 }
 
-Todo Database::createTodo(const std::string& text, int user_id) {
+Todo Database::createTodo(const std::string& text, int user_id, const std::string& due_date) {
     std::string timestamp = getCurrentTimestamp();
-    const char* sql = "INSERT INTO todos (user_id, text, completed, created_at, updated_at) VALUES (?, ?, 0, ?, ?)";
+    const char* sql = "INSERT INTO todos (user_id, text, completed, created_at, updated_at, due_date) VALUES (?, ?, 0, ?, ?, ?)";
     
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db_) << std::endl;
-        return {-1, -1, "", false, "", ""};
+        return {-1, -1, "", false, "", "", ""};
     }
     
     sqlite3_bind_int(stmt, 1, user_id);
     sqlite3_bind_text(stmt, 2, text.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, timestamp.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, timestamp.c_str(), -1, SQLITE_STATIC);
+    if (due_date.empty()) {
+        sqlite3_bind_null(stmt, 5);
+    } else {
+        sqlite3_bind_text(stmt, 5, due_date.c_str(), -1, SQLITE_STATIC);
+    }
     
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
     
     if (rc != SQLITE_DONE) {
         std::cerr << "Failed to insert todo: " << sqlite3_errmsg(db_) << std::endl;
-        return {-1, -1, "", false, "", ""};
+        return {-1, -1, "", false, "", "", ""};
     }
     
     int id = sqlite3_last_insert_rowid(db_);
-    return {id, user_id, text, false, timestamp, timestamp};
+    return {id, user_id, text, false, timestamp, timestamp, due_date};
 }
 
 Todo Database::updateTodo(int id, const std::string& text, bool completed, int user_id) {
@@ -162,7 +172,7 @@ Todo Database::updateTodo(int id, const std::string& text, bool completed, int u
     int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db_) << std::endl;
-        return {-1, -1, "", false, "", ""};
+        return {-1, -1, "", false, "", "", ""};
     }
     
     sqlite3_bind_text(stmt, 1, text.c_str(), -1, SQLITE_STATIC);
@@ -176,7 +186,7 @@ Todo Database::updateTodo(int id, const std::string& text, bool completed, int u
     
     if (rc != SQLITE_DONE) {
         std::cerr << "Failed to update todo: " << sqlite3_errmsg(db_) << std::endl;
-        return {-1, -1, "", false, "", ""};
+        return {-1, -1, "", false, "", "", ""};
     }
     
     return getTodoById(id, user_id);

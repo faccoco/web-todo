@@ -47,6 +47,19 @@ body {
   border-color: #007bff;
 }
 
+.add-todo-date {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  min-width: 150px;
+}
+
+.add-todo-date:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
 .add-todo-btn {
   padding: 12px 24px;
   background-color: #007bff;
@@ -108,6 +121,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .todo-text {
@@ -119,6 +134,48 @@ body {
 .todo-item.completed .todo-text {
   text-decoration: line-through;
   color: #888;
+}
+
+.todo-due-date {
+  font-size: 12px;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.todo-item.overdue {
+  border-left: 4px solid #dc3545;
+  background-color: #fff5f5;
+}
+
+.todo-item.overdue .todo-due-date {
+  background-color: #f8d7da;
+  color: #721c24;
+  font-weight: 600;
+}
+
+.todo-item.due-today {
+  border-left: 4px solid #ffc107;
+  background-color: #fffbf0;
+}
+
+.todo-item.due-today .todo-due-date {
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: 600;
+}
+
+.todo-item.due-soon {
+  border-left: 4px solid #17a2b8;
+  background-color: #f1f9fc;
+}
+
+.todo-item.due-soon .todo-due-date {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  font-weight: 600;
 }
 
 .todo-actions {
@@ -382,6 +439,10 @@ body {
   
   .add-todo-form {
     flex-direction: column;
+  }
+  
+  .add-todo-date {
+    min-width: auto;
   }
   
   .todo-text-container {

@@ -26,11 +26,16 @@ export class TodoAPI {
     return response.json();
   }
 
-  static async createTodo(text: string): Promise<Todo> {
+  static async createTodo(text: string, dueDate?: string): Promise<Todo> {
+    const body: any = { text };
+    if (dueDate) {
+      body.dueDate = dueDate;
+    }
+    
     const response = await fetch(`${API_BASE_URL}/api/todos`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(body),
     });
     
     if (!response.ok) {

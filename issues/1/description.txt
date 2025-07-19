@@ -1,0 +1,62 @@
+### **Issue #1: 为待办事项添加“到期时间”功能**
+
+#### **1. 问题描述 (Problem Description)**
+
+当前版本的 `web-todo` 应用中，每个待办事项仅记录了创建时间，但没有一个关键字段：“到期时间”（Due Date）。这使得用户无法为任务设置截止日期，限制了其作为任务管理工具的有效性。
+
+#### **2. 功能目标 (Feature Goal)**
+
+为待办事项实体增加 `due_date` 属性，并贯穿整个技术栈（前端、后端、数据库），允许用户在创建和查看待办事项时指定和看到其到期时间。
+
+#### **3. 实施方案 (Implementation Plan)**
+
+##### **3.1. 后端 (Backend - C++)**
+
+1.  **数据库 (Database):**
+    *   在 `todos` 表中增加一个新的列，例如 `due_date`。推荐使用 `TEXT` 或 `DATETIME` 类型。使用 `TEXT` 类型存储 `ISO 8601` 格式的字符串（如 `YYYY-MM-DDTHH:MM:SS.SSSZ`）可以简化跨时区处理。
+    *   需要编写一个数据库迁移脚本或手动更新现有数据库结构。
+
+2.  **数据访问层 (`database.cpp` / `database.h`):**
+    *   更新 `Todo` 结构体（如果在 `database.h` 或类似文件中定义），增加 `std::string due_date;` 成员。
+    *   修改 `create_todo` 函数的 SQL `INSERT` 语句，使其包含 `due_date` 列。
+    *   修改 `get_todos_by_user` 函数的 SQL `SELECT` 语句，以从数据库中检索 `due_date` 列。
+
+3.  **服务层 (`todo_service.cpp` / `todo_service.h`):**
+    *   更新 `TodoService` 中处理待办事项的逻辑，确保 `due_date` 字段能够被正确处理。
+    *   修改创建待办事项的函数，使其接受 `due_date` 参数。该参数应从 API 请求的 JSON body 中解析。
+
+4.  **API 接口 (`main.cpp` 或 `simple_http_server.cpp`):**
+    *   **`POST /todos`:** 修改创建待办事项的端点，使其能够接收请求体（JSON body）中的 `dueDate` 字段。
+    *   **`GET /todos`:** 修改获取待办事项列表的端点，确保返回的 JSON 对象中包含 `dueDate` 字段。
+
+##### **3.2. 前端 (Frontend - React)**
+
+1.  **类型定义 (`src/types.ts`):**
+    *   在 `Todo` 类型接口中增加 `dueDate` 字段，类型为 `string` 或 `Date`。
+        ```typescript
+        export interface Todo {
+          id: number;
+          user_id: number;
+          content: string;
+          created_at: string;
+          dueDate?: string; // or Date
+        }
+        ```
+
+2.  **API 调用 (`src/api.ts`):**
+    *   更新 `createTodo` 函数，使其在请求体中包含 `dueDate`。
+
+3.  **UI 组件:**
+    *   **创建表单 (位于 `TodoList.tsx` 或新组件):**
+        *   在添加新待办事项的输入框旁边，增加一个日期选择器（`<input type="date">` 是一个简单的实现方式）。
+        *   当用户提交表单时，获取日期选择器的值，并将其传递给 `api.createTodo` 函数。
+    *   **待办事项展示 (`TodoItem.tsx`):**
+        *   在每个待办事项的展示卡片上，显示其 `dueDate`。
+        *   可以考虑对即将到期或已过期的任务进行特殊高亮（例如，用不同颜色标记）。
+
+#### **4. 验收标准 (Acceptance Criteria)**
+
+1.  用户可以在创建新的待办事项时，通过 UI 上的日期选择器设置一个到期时间。
+2.  创建后，该待办事项的到期时间被成功保存到数据库中。
+3.  在待办事项列表中，每个项目都会清晰地展示其设置的到期时间。
+4.  如果某个待办事项没有设置到期时间，UI 应能优雅地处理（例如，不显示或显示“未设置”）。

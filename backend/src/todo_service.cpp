@@ -17,8 +17,8 @@ Todo TodoService::getTodoById(int id, int user_id) {
     return db_->getTodoById(id, user_id);
 }
 
-Todo TodoService::createTodo(const std::string& text, int user_id) {
-    return db_->createTodo(text, user_id);
+Todo TodoService::createTodo(const std::string& text, int user_id, const std::string& due_date) {
+    return db_->createTodo(text, user_id, due_date);
 }
 
 Todo TodoService::updateTodo(int id, const std::string& text, bool completed, int user_id) {
