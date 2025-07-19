@@ -6,6 +6,7 @@ import TodoItem from './TodoItem';
 const TodoList: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoText, setNewTodoText] = useState('');
+  const [newTodoDueDate, setNewTodoDueDate] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,9 +37,10 @@ const TodoList: React.FC = () => {
     if (!newTodoText.trim()) return;
 
     try {
-      const newTodo = await TodoAPI.createTodo(newTodoText.trim());
+      const newTodo = await TodoAPI.createTodo(newTodoText.trim(), newTodoDueDate || undefined);
       setTodos([newTodo, ...todos]);
       setNewTodoText('');
+      setNewTodoDueDate('');
       setError(null);
     } catch (err) {
       setError('Failed to create todo');
@@ -86,6 +88,13 @@ const TodoList: React.FC = () => {
           onChange={(e) => setNewTodoText(e.target.value)}
           placeholder="Add a new todo..."
           className="add-todo-input"
+        />
+        <input
+          type="date"
+          value={newTodoDueDate}
+          onChange={(e) => setNewTodoDueDate(e.target.value)}
+          className="add-todo-date"
+          title="Due date (optional)"
         />
         <button type="submit" className="add-todo-btn">Add Todo</button>
       </form>

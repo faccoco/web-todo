@@ -37,7 +37,13 @@ std::string todoToJson(const Todo& todo) {
     ss << "\"text\":\"" << escapeJson(todo.text) << "\",";
     ss << "\"completed\":" << (todo.completed ? "true" : "false") << ",";
     ss << "\"created_at\":\"" << escapeJson(todo.created_at) << "\",";
-    ss << "\"updated_at\":\"" << escapeJson(todo.updated_at) << "\"";
+    ss << "\"updated_at\":\"" << escapeJson(todo.updated_at) << "\",";
+    ss << "\"due_date\":";
+    if (todo.due_date.empty()) {
+        ss << "null";
+    } else {
+        ss << "\"" << escapeJson(todo.due_date) << "\"";
+    }
     ss << "}";
     return ss.str();
 }
@@ -233,8 +239,9 @@ private:
                         response_body = todosToJson(todos);
                     } else if (method == "POST" && path == "/api/todos") {
                         std::string text = extractJsonField(body, "text");
+                        std::string due_date = extractJsonField(body, "dueDate");
                         if (!text.empty()) {
-                            auto todo = todoService_.createTodo(text, user_auth->user_id);
+                            auto todo = todoService_.createTodo(text, user_auth->user_id, due_date);
                             response_body = todoToJson(todo);
                             status_code = 201;
                         } else {

@@ -11,6 +11,19 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
 
+  const getDueDateStatus = () => {
+    if (!todo.due_date) return '';
+    const today = new Date();
+    const dueDate = new Date(todo.due_date);
+    const timeDiff = dueDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
+    if (daysDiff < 0) return 'overdue';
+    if (daysDiff === 0) return 'due-today';
+    if (daysDiff <= 3) return 'due-soon';
+    return '';
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editText.trim()) {
@@ -29,7 +42,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onUpdate, onDelete }) => {
   };
 
   return (
-    <li className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+    <li className={`todo-item ${todo.completed ? 'completed' : ''} ${getDueDateStatus()}`}>
       <div className="todo-content">
         <input
           type="checkbox"
@@ -55,6 +68,11 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onUpdate, onDelete }) => {
         ) : (
           <div className="todo-text-container">
             <span className="todo-text">{todo.text}</span>
+            {todo.due_date && (
+              <span className="todo-due-date">
+                Due: {new Date(todo.due_date).toLocaleDateString()}
+              </span>
+            )}
             <div className="todo-actions">
               <button onClick={() => setIsEditing(true)} className="edit-btn">Edit</button>
               <button onClick={() => onDelete(todo.id)} className="delete-btn">Delete</button>

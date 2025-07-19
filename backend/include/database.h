@@ -12,6 +12,7 @@ struct Todo {
     bool completed;
     std::string created_at;
     std::string updated_at;
+    std::string due_date;
 };
 
 struct User {
@@ -33,7 +34,7 @@ public:
     // Todo methods
     std::vector<Todo> getAllTodos(int user_id);
     Todo getTodoById(int id, int user_id);
-    Todo createTodo(const std::string& text, int user_id);
+    Todo createTodo(const std::string& text, int user_id, const std::string& due_date = "");
     Todo updateTodo(int id, const std::string& text, bool completed, int user_id);
     bool deleteTodo(int id, int user_id);
     
